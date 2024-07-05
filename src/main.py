@@ -1,3 +1,5 @@
+"""main.py"""
+
 import logging
 import json
 
@@ -11,6 +13,9 @@ logger.setLevel(logging.INFO)
 
 
 def initialise_driver():
+    """
+    Initialise Chrome driver
+    """
     chrome_options = ChromeOptions()
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
@@ -29,32 +34,29 @@ def initialise_driver():
 
     service = Service(
         executable_path="/opt/chrome-driver/chromedriver-linux64/chromedriver",
-        service_log_path="/tmp/chromedriver.log"
+        service_log_path="/tmp/chromedriver.log",
     )
 
-    driver = webdriver.Chrome(
-        service=service,
-        options=chrome_options
-    )
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     return driver
 
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda handler
+    """
+    logger.info("Entered `lambda_handler` with %s and %s", event, context)
     driver = initialise_driver()
     driver.get("https://wbyte.dev")
-    logger.info(f"Page title: ${driver.title}")
+    logger.info("Page title: $%s", driver.title)
 
-    body = {
-        "title": driver.title
-    }
+    body = {"title": driver.title}
 
     response = {
         "statusCode": 200,
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "body": json.dumps(body)
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(body),
     }
 
     return response
