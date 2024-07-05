@@ -16,6 +16,7 @@ def initialise_driver():
     """
     Initialise Chrome driver
     """
+    logger.info("`initialise_driver`")
     chrome_options = ChromeOptions()
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
