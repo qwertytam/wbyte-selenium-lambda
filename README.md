@@ -26,7 +26,7 @@ Before getting started, ensure you have the following:
 2. **Set up Environment Variables**:
    Set `AWS_ACCOUNT_ID` and `AWS_REGION` in your GitHub repository secrets. These are required for assuming the role to deploy resources in your AWS account.
 3. **Deploy the Infrastructure**:
-   By pushing to the main branch the GitHub actions will be deploy the application, if and only if, all required environment varbiables have been set.
+   By pushing to the main branch the GitHub actions will be deploy the application, if and only if, all required environment variables have been set.
 
 ## GitHub Workflow
 
