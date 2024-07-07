@@ -19,7 +19,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-          role-session-name: github-action-role
+          role-session-name: github-action-role-oidc
           aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Verification step 
