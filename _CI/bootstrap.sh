@@ -10,7 +10,11 @@ if [[ -d "infra" ]]; then
     npm ci --include=dev
 
     echo "Synthesize infra.."
-
+    echo ${APPLICATION_NAME}
+    echo ${AWS_ACCOUNT_ID}
+    echo ${AWS_REGION}
+    echo ${API_KEY}
+    echo ${APPLICATION_TAG}
     npm run cdk synth -- \
         --context name=${APPLICATION_NAME} \
         --context accountId=${AWS_ACCOUNT_ID} \
