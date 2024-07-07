@@ -12,7 +12,6 @@ if [[ -d "infra" ]]; then
     echo "Synthesize infra.."
 
     npm run cdk synth -- \
-        --quiet \
         --context name=${APPLICATION_NAME} \
         --context accountId=${AWS_ACCOUNT_ID} \
         --context region=${AWS_REGION} \
