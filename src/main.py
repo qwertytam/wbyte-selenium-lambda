@@ -54,6 +54,9 @@ def put_object(data, bucket, object_key):
 
     obj_wrapper = ObjectWrapper(bucket.Object(object_key))
 
+    object_list = ObjectWrapper.list(bucket)
+    print(f"Current object keys are: '{', '.join(o.key for o in object_list)}'")
+
     if isinstance(data, str):
         obj_wrapper.put(data.encode(encoding="utf-8"))
     else:
@@ -87,9 +90,6 @@ def lambda_handler(event, context):
 
     s3_bucket = event.get("s3-bucket", "")
     s3_object_key = event.get("s3-object-key", "")
-
-    object_list = ObjectWrapper.list(s3_bucket)
-    print(f"Current object keys are: {', '.join(o.key for o in object_list)}")
 
     print(f"Putting '{test_url}' into object '{s3_object_key}' in bucket '{s3_bucket}'")
     put_object(test_url, s3_bucket, s3_object_key)
