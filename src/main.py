@@ -2,14 +2,17 @@
 
 import logging
 import json
-
 from tempfile import mkdtemp
+
+import boto3
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+from src.objectwrapper import ObjectWrapper
+
+logger = logging.getLogger(__name__)
 
 
 def initialise_driver():
@@ -43,14 +46,30 @@ def initialise_driver():
     return driver
 
 
+def put_object(data, bucket, object_key):
+    """
+    AWS Lambda handler
+    """
+    s3_resource = boto3.resource("s3")
+    bucket = s3_resource.Bucket(bucket)
+
+    obj_wrapper = ObjectWrapper(bucket.Object(object_key))
+    obj_wrapper.put(data)
+
+    logger.info("Have put '%s' into object '%s'", data, object_key)
+
+
 def lambda_handler(event, context):
     """
     AWS Lambda handler
     """
     logger.info("Entered `lambda_handler` with %s and %s", event, context)
+
+    test_url = event.get("test-url", "")
+    logger.info("Init driver and getting url '%s'", test_url)
     driver = initialise_driver()
-    driver.get("https://wbyte.dev")
-    logger.info("Page title: $%s", driver.title)
+    driver.get(test_url)
+    logger.info("Page title: '%s'", driver.title)
 
     body = {"title": driver.title}
 
@@ -59,5 +78,15 @@ def lambda_handler(event, context):
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps(body),
     }
+
+    s3_bucket = event.get("s3-bucket", "")
+    s3_object_key = event.get("s3-object-key", "")
+
+    logger.info(
+        "Putting '%s' into object '%s' in bucket '%s'",
+        test_url,
+        s3_object_key,
+        s3_bucket,
+    )
 
     return response
