@@ -18,7 +18,7 @@ def initialise_driver():
     """
     Initialise Chrome driver
     """
-    logger.info("`initialise_driver`")
+    print("Initialising driver")
     chrome_options = ChromeOptions()
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
@@ -55,20 +55,20 @@ def put_object(data, bucket, object_key):
     obj_wrapper = ObjectWrapper(bucket.Object(object_key))
     obj_wrapper.put(data)
 
-    logger.info("Have put '%s' into object '%s'", data, object_key)
+    print("Have put '%s' into object '%s'", data, object_key)
 
 
 def lambda_handler(event, context):
     """
     AWS Lambda handler
     """
-    logger.info("Entered `lambda_handler` with %s and %s", event, context)
+    print("Entered `lambda_handler` with %s and %s", event, context)
 
     test_url = event.get("test-url", "")
-    logger.info("Init driver and getting url '%s'", test_url)
+    print("Init driver and getting url '%s'", test_url)
     driver = initialise_driver()
     driver.get(test_url)
-    logger.info("Page title: '%s'", driver.title)
+    print("Page title: '%s'", driver.title)
 
     body = {"title": driver.title}
 
@@ -81,7 +81,7 @@ def lambda_handler(event, context):
     s3_bucket = event.get("s3-bucket", "")
     s3_object_key = event.get("s3-object-key", "")
 
-    logger.info(
+    print(
         "Putting '%s' into object '%s' in bucket '%s'",
         test_url,
         s3_object_key,
@@ -126,7 +126,7 @@ class ObjectWrapper:
         try:
             self.object.put(Body=put_data)
             self.object.wait_until_exists()
-            logger.info(
+            print(
                 "Put object '%s' to bucket '%s'.",
                 self.object.key,
                 self.object.bucket_name,
@@ -151,7 +151,7 @@ class ObjectWrapper:
         """
         try:
             body = self.object.get()["Body"].read()
-            logger.info(
+            print(
                 "Got object '%s' from bucket '%s'.",
                 self.object.key,
                 self.object.bucket_name,
@@ -184,7 +184,7 @@ class ObjectWrapper:
                 objects = list(bucket.objects.all())
             else:
                 objects = list(bucket.objects.filter(Prefix=prefix))
-            logger.info(
+            print(
                 "Got objects %s from bucket '%s'", [o.key for o in objects], bucket.name
             )
         except ObjClientExceptions:
@@ -200,7 +200,7 @@ class ObjectWrapper:
         try:
             self.object.delete()
             self.object.wait_until_not_exists()
-            logger.info(
+            print(
                 "Deleted object '%s' from bucket '%s'.",
                 self.object.key,
                 self.object.bucket_name,
@@ -231,7 +231,7 @@ class ObjectWrapper:
                 Delete={"Objects": [{"Key": key} for key in object_keys]}
             )
             if "Deleted" in response:
-                logger.info(
+                print(
                     "Deleted objects '%s' from bucket '%s'.",
                     [del_obj["Key"] for del_obj in response["Deleted"]],
                     bucket.name,
@@ -261,7 +261,7 @@ class ObjectWrapper:
         """
         try:
             bucket.objects.delete()
-            logger.info("Emptied bucket '%s'.", bucket.name)
+            print("Emptied bucket '%s'.", bucket.name)
         except ObjClientExceptions:
             logger.exception("Couldn't empty bucket '%s'.", bucket.name)
             raise
