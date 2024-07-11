@@ -83,8 +83,8 @@ def lambda_handler(event, context):
 
     s3_bucket = event.get("s3-bucket", "")
     s3_object_key = event.get("s3-object-key", "")
-
     print(f"Putting '{test_url}' into object '{s3_object_key}' in bucket '{s3_bucket}'")
+    put_object(test_url, s3_bucket, s3_object_key)
 
     return response
 
