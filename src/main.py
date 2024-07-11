@@ -55,20 +55,23 @@ def put_object(data, bucket, object_key):
     obj_wrapper = ObjectWrapper(bucket.Object(object_key))
     obj_wrapper.put(data)
 
-    print("Have put '%s' into object '%s'", data, object_key)
+    print(f"Have put '{data}' into object '{object_key}'")
+
+    object_list = ObjectWrapper.list(bucket)
+    print(f"Object keys are: {', '.join(o.key for o in object_list)}")
 
 
 def lambda_handler(event, context):
     """
     AWS Lambda handler
     """
-    print("Entered `lambda_handler` with %s and %s", event, context)
+    print(f"Entered `lambda_handler()` with '{event}' and {context}")
 
     test_url = event.get("test-url", "")
-    print("Init driver and getting url '%s'", test_url)
+    print(f"Init driver and getting url '{test_url}'")
     driver = initialise_driver()
     driver.get(test_url)
-    print("Page title: '%s'", driver.title)
+    print(f"Page title: '{driver.title}'")
 
     body = {"title": driver.title}
 
@@ -81,12 +84,7 @@ def lambda_handler(event, context):
     s3_bucket = event.get("s3-bucket", "")
     s3_object_key = event.get("s3-object-key", "")
 
-    print(
-        "Putting '%s' into object '%s' in bucket '%s'",
-        test_url,
-        s3_object_key,
-        s3_bucket,
-    )
+    print(f"Putting '{test_url}' into object '{s3_object_key}' in bucket '{s3_bucket}'")
 
     return response
 
@@ -127,9 +125,7 @@ class ObjectWrapper:
             self.object.put(Body=put_data)
             self.object.wait_until_exists()
             print(
-                "Put object '%s' to bucket '%s'.",
-                self.object.key,
-                self.object.bucket_name,
+                f"Put object '{self.object.key}' to bucket '{self.object.bucket_name}'."
             )
         except ObjClientExceptions:
             logger.exception(
