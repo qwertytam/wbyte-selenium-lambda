@@ -10,7 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 
-from src.objectwrapper import ObjectWrapper
+from objectwrapper import ObjectWrapper
 
 logger = logging.getLogger(__name__)
 
