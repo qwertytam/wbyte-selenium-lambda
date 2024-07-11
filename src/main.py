@@ -47,7 +47,7 @@ def initialise_driver():
 
 def put_object(data, bucket, object_key):
     """
-    AWS Lambda handler
+    ...
     """
     s3_resource = boto3.resource("s3")
     bucket = s3_resource.Bucket(bucket)
@@ -68,6 +68,39 @@ def put_object(data, bucket, object_key):
     print(f"Object keys are: {', '.join(o.key for o in object_list)}")
 
 
+def send_email(aws_region_name, to_addr, subject_text, body_text, sender_addr):
+    """
+    ...
+    """
+    client = boto3.client("ses", aws_region_name)
+
+    response = client.send_email(
+        Destination={"ToAddresses": [to_addr]},
+        Message={
+            "Body": {
+                "Text": {
+                    "Charset": "UTF-8",
+                    "Data": body_text,
+                }
+            },
+            "Subject": {
+                "Charset": "UTF-8",
+                "Data": subject_text,
+            },
+        },
+        Source=sender_addr,
+    )
+
+    print(f"Email sent with response: {response}")
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps(
+            f"Email send success. MessageID is: '{response['MessageId']}'"
+        ),
+    }
+
+
 def lambda_handler(event, context):
     """
     AWS Lambda handler
@@ -82,17 +115,38 @@ def lambda_handler(event, context):
 
     body = {"title": driver.title}
 
-    response = {
-        "statusCode": 200,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(body),
-    }
-
     s3_bucket = event.get("s3-bucket", "")
     s3_object_key = event.get("s3-object-key", "")
 
     print(f"Putting '{test_url}' into object '{s3_object_key}' in bucket '{s3_bucket}'")
     put_object(test_url, s3_bucket, s3_object_key)
+
+    aws_region_name = event.get()
+    to_addr = event.get("email-to-addr", "")
+    subject_text = event.get("email-subject", "")
+    body_text = event.get("email-body", "")
+    sender_addr = event.get("email-sender-addr", "")
+
+    print(
+        "Trying email send from "
+        f"region '{aws_region_name}' "
+        f"to '{to_addr}' "
+        f"subject '{subject_text}' "
+        f"body '{body_text}' "
+        f"sender '{sender_addr}' "
+    )
+
+    email_response = send_email(
+        aws_region_name, to_addr, subject_text, body_text, sender_addr
+    )
+
+    response_body = body + " | " + email_response["body"]
+
+    response = {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(response_body),
+    }
 
     return response
 
