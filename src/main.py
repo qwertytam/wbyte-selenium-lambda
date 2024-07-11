@@ -87,7 +87,7 @@ def send_email(aws_region_name, to_addr, subject_text, body_text, sender_addr):
                     "Data": body_text,
                 },
                 "Html": {
-                    "Charset": "string",
+                    "Charset": "UTF-8",
                     "Data": body_text,
                 },
             },
