@@ -53,7 +53,11 @@ def put_object(data, bucket, object_key):
     bucket = s3_resource.Bucket(bucket)
 
     obj_wrapper = ObjectWrapper(bucket.Object(object_key))
-    obj_wrapper.put(data)
+
+    if isinstance(data, str):
+        obj_wrapper.put(data.encode(encoding="utf-8"))
+    else:
+        obj_wrapper.put(data)
 
     print(f"Have put '{data}' into object '{object_key}'")
 
