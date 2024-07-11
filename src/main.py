@@ -77,15 +77,19 @@ def send_email(aws_region_name, to_addr, subject_text, body_text, sender_addr):
     response = client.send_email(
         Destination={"ToAddresses": [to_addr]},
         Message={
+            "Subject": {
+                "Charset": "UTF-8",
+                "Data": subject_text,
+            },
             "Body": {
                 "Text": {
                     "Charset": "UTF-8",
                     "Data": body_text,
-                }
-            },
-            "Subject": {
-                "Charset": "UTF-8",
-                "Data": subject_text,
+                },
+                "Html": {
+                    "Charset": "string",
+                    "Data": body_text,
+                },
             },
         },
         Source=sender_addr,
