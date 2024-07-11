@@ -121,7 +121,7 @@ def lambda_handler(event, context):
     print(f"Putting '{test_url}' into object '{s3_object_key}' in bucket '{s3_bucket}'")
     put_object(test_url, s3_bucket, s3_object_key)
 
-    aws_region_name = event.get()
+    aws_region_name = event.get("aws-region-name")
     to_addr = event.get("email-to-addr", "")
     subject_text = event.get("email-subject", "")
     body_text = event.get("email-body", "")
