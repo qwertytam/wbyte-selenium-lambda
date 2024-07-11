@@ -140,7 +140,7 @@ def lambda_handler(event, context):
         aws_region_name, to_addr, subject_text, body_text, sender_addr
     )
 
-    response_body = body + " | " + email_response["body"]
+    response_body = f"{body} | {email_response['body']}"
 
     response = {
         "statusCode": 200,
