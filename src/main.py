@@ -68,31 +68,16 @@ def put_object(data, bucket, object_key):
     print(f"Object keys are: {', '.join(o.key for o in object_list)}")
 
 
-def send_email(aws_region_name, to_addr, subject_text, body_text, sender_addr):
+def send_email(sns_topic_arn, subject_text, body_text):
     """
     ...
     """
-    client = boto3.client("ses", aws_region_name)
 
-    response = client.send_email(
-        Destination={"ToAddresses": [to_addr]},
-        Message={
-            "Subject": {
-                "Charset": "UTF-8",
-                "Data": subject_text,
-            },
-            "Body": {
-                "Text": {
-                    "Charset": "UTF-8",
-                    "Data": body_text,
-                },
-                "Html": {
-                    "Charset": "UTF-8",
-                    "Data": body_text,
-                },
-            },
-        },
-        Source=sender_addr,
+    sns_client = boto3.client("sns")
+    response = sns_client.publish(
+        TopicArn=sns_topic_arn,
+        Subject=subject_text,
+        Message=body_text,
     )
 
     print(f"Email sent with response: {response}")
@@ -125,24 +110,18 @@ def lambda_handler(event, context):
     print(f"Putting '{test_url}' into object '{s3_object_key}' in bucket '{s3_bucket}'")
     put_object(test_url, s3_bucket, s3_object_key)
 
-    aws_region_name = event.get("aws-region-name")
-    to_addr = event.get("email-to-addr", "")
+    sns_topic_arn = event.get("sns-topic-arn")
     subject_text = event.get("email-subject", "")
     body_text = event.get("email-body", "")
-    sender_addr = event.get("email-sender-addr", "")
 
     print(
         "Trying email send from "
-        f"region '{aws_region_name}' "
-        f"to '{to_addr}' "
+        f"sns_topic_arn '{sns_topic_arn}' "
         f"subject '{subject_text}' "
         f"body '{body_text}' "
-        f"sender '{sender_addr}' "
     )
 
-    email_response = send_email(
-        aws_region_name, to_addr, subject_text, body_text, sender_addr
-    )
+    email_response = send_email(sns_topic_arn, subject_text, body_text)
 
     response_body = f"{body} | {email_response['body']}"
 
